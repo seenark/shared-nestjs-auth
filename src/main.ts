@@ -3,6 +3,7 @@ import { AppModule } from "./app.module";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { NestApplicationOptions } from "@nestjs/common";
 import { readFileSync } from "fs";
+import * as cookieParser from "cookie-parser";
 
 async function bootstrap() {
   const options: NestApplicationOptions = {
@@ -12,6 +13,7 @@ async function bootstrap() {
     },
   };
   const app = await NestFactory.create(AppModule, options);
+  app.use(cookieParser());
 
   const config = new DocumentBuilder()
     .setTitle("My API")

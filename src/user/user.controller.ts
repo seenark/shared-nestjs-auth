@@ -13,7 +13,9 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
   UsePipes,
 } from "@nestjs/common";
@@ -32,6 +34,10 @@ import {
   UserResponseSchema,
 } from "./dto/user.dto";
 import { UserService } from "./user.service";
+import { AuthGuard } from "@nestjs/passport";
+import { JwtAuthGuard } from "src/guard/jwt/jwt-auth.guard";
+import { Request } from "express";
+import { IJwtPayload, JwtPayload } from "src/guard/jwt/jwt-data.decorator";
 
 @Controller("user")
 @ApiTags("User")
@@ -43,7 +49,8 @@ export class UserController {
     type: UserDto,
     isArray: true,
   })
-  async getAllUser() {
+  @UseGuards(JwtAuthGuard)
+  async getAllUser(@JwtPayload() jwtPayload: IJwtPayload) {
     try {
       const users = await this.userService.getAllUser();
       return users.map((u) => UserResponseSchema.parse(u));
@@ -71,7 +78,7 @@ export class UserController {
     @Query("surname") surname: string,
   ) {
     console.log("query params", name, surname);
-    const user = await this.userService.getUserById(id);
+    const user = await this.userService.getUserById(+id);
     if (!user) {
       throw new NotFoundException("not found user");
     }
@@ -90,8 +97,6 @@ export class UserController {
         email: body.email,
         name: body.name,
         password: body.password,
-        refreshToken: "",
-        uuidForRefreshToken: "",
       });
       const user = UserResponseSchema.parse(savedUser);
       return user;
@@ -107,7 +112,7 @@ export class UserController {
   async updateUser(@Param("id") id: string, @Body() body: UserDto) {
     console.log("patch user", body);
     try {
-      const updatedUser = await this.userService.updateUser(id, {
+      const updatedUser = await this.userService.updateUser(+id, {
         email: body.email,
         name: body.name,
         password: body.password,
@@ -125,7 +130,7 @@ export class UserController {
   })
   async deleteUser(@Param("id") id: string) {
     try {
-      const user = await this.userService.deleteUser(id);
+      const user = await this.userService.deleteUser(+id);
       return UserResponseSchema.parse(user);
     } catch (error) {
       throw new InternalServerErrorException("delete user error");

@@ -8,7 +8,12 @@ import { diskStorage } from "multer";
 import { randomUUID } from "crypto";
 import { extname, join } from "path";
 import { ServeStaticModule } from "@nestjs/serve-static";
-import { PrismaService } from './prisma/prisma.service';
+import { PrismaService } from "./prisma/prisma.service";
+import { AuthController } from "./auth/auth.controller";
+import { AuthService } from "./auth/auth.service";
+import { JwtModule } from "@nestjs/jwt";
+import { PasswordService } from "./auth/password/password.service";
+import { JwtStrategy } from "./guard/jwt/jwt.service";
 
 @Module({
   imports: [
@@ -33,8 +38,21 @@ import { PrismaService } from './prisma/prisma.service';
       rootPath: join(__dirname, "..", "upload"),
       serveRoot: "/images", // /lo:3000/images/...png
     }),
+    JwtModule.register({
+      secret: "aaaa",
+      signOptions: {
+        expiresIn: "15m",
+      },
+    }),
   ],
-  controllers: [AppController, UserController],
-  providers: [AppService, UserService, PrismaService],
+  controllers: [AppController, UserController, AuthController],
+  providers: [
+    AppService,
+    UserService,
+    PrismaService,
+    AuthService,
+    PasswordService,
+    JwtStrategy,
+  ],
 })
 export class AppModule {}
