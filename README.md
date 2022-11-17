@@ -15,8 +15,10 @@
 - Lazy loading,
 - security eg. XSS, Frame-Option, CrossDomainPolicies,StrictTransportSecurity, hidePowerBy
 
+[Authentication Diagram](https://www.figma.com/file/hl3kZWpJMEy6cGQLo48sq6/Login-Process?node-id=0%3A1&t=oG0S8ZhgAdaHLkdH-0)
 
 **How** 
+
 
 ---
 
